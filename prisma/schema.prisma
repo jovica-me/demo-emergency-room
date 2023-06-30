@@ -1,18 +1,132 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+generator trpc {
+    provider        = "prisma-trpc-generator"
+    withZod         = true
+    withMiddleware  = false
+    withShield      = false
+    contextPath     = "../src/context"
+    trpcOptionsPath = "../src/trpcOptions"
+}
+
 generator client {
     provider = "prisma-client-js"
-    previewFeatures = ["jsonProtocol"]
 }
 
 datasource db {
-    provider = "sqlite"
-    url      = env("DATABASE_URL")
+    provider          = "mysql"
+    url               = env("SHADOW_DATABASE_URL")
+    shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+    relationMode      = "prisma"
 }
 
 model Example {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+model Pacijent {
+    jmbg        BigInt   @id
+    ime         String
+    prezime     String
+    datumRodj   DateTime
+    lbo         String
+    danKreacije DateTime @default(now())
+
+    posete Poseta[]
+}
+
+model Poseta {
+    id        String    @id @default(cuid())
+    dolazak   DateTime  @default(now())
+    odlazak   DateTime?
+    gotova    Boolean   @default(false)
+    uput      String?
+    simptomi  String
+    prioritet Int
+
+    pacijent     Pacijent @relation(fields: [pacijentJMBG], references: [jmbg])
+    pacijentJMBG BigInt
+
+    sokSoba SokSoba?
+
+    pregledi Pregled[]
+}
+
+model SokSoba {
+    id      String  @id @default(cuid())
+    zauzeta Boolean @default(false)
+
+    poseta   Poseta? @relation(fields: [posetaId], references: [id])
+    posetaId String? @unique
+}
+
+model Pregled {
+    id    String  @id @default(cuid())
+    gotov Boolean @default(false)
+
+    poseta   Poseta @relation(fields: [posetaId], references: [id])
+    posetaId String
+
+    ordinacija   Ordinacija @relation(fields: [ordinacijaId], references: [id])
+    ordinacijaId String
+
+    izvestaj Izvestaj?
+}
+
+model Izvestaj {
+    id    String   @id @default(cuid())
+    datum DateTime @default(now())
+
+    misljenjeDoktora String
+    terapija         String?
+    kontorla         String?
+
+    pregled   Pregled @relation(fields: [pregledId], references: [id])
+    pregledId String  @unique
+
+    datoteke Datoteka[]
+}
+
+model Datoteka {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+
+    naziv String
+    path  String
+
+    izvestaj   Izvestaj @relation(fields: [izvestajId], references: [id])
+    izvestajId String   @unique
+}
+
+model Ordinacija {
+    id            String @id @default(cuid())
+    imeOrdinacija String
+    brojSobe      String
+    telefon       String
+    kapacitet     Int
+
+    pregledi Pregled[]
+    osoblje  Osoblje[]
+}
+
+model Osoblje {
+    id      String @id @default(cuid())
+    ime     String
+    prezime String
+    kontakt String
+
+    ordinacija   Ordinacija @relation(fields: [ordinacijaId], references: [id])
+    ordinacijaId String
+
+    tipOsoblja TipOsoblja @default(NE_MEDICINSKO)
+}
+
+enum TipOsoblja {
+    NE_MEDICINSKO
+    MEDICINSKI_RADNIK
+    DOKTOR
+    HIRURG
 }
