@@ -36,6 +36,7 @@ export default function AddPregledi({ close }: { close: () => void }) {
 
   const onSubmit = () => {
     if (!selected) return;
+    if (!idPosete) return;
     void mutateAsync({
       ordinacijaId: selected?.id,
       posetaId: idPosete,

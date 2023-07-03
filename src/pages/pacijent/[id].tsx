@@ -143,9 +143,9 @@ function Layout({ id }: { id: string }) {
                       flushSync(() => {
                         setIsOdjavaModalOpen(false);
                         if (aktivnaPoseta.sokSoba) {
-                          endWithSok.mutate(aktivnaPoseta.id);
+                          void endWithSok.mutate(aktivnaPoseta.id);
                         } else {
-                          end.mutate(aktivnaPoseta.id);
+                          void end.mutate(aktivnaPoseta.id);
                         }
                         void pacijentQuery.refetch({
                           stale: true,
@@ -195,7 +195,7 @@ function Layout({ id }: { id: string }) {
                 {!aktivnaPoseta.sokSoba && (
                   <button
                     onClick={() => {
-                      rezSokSobu.mutateAsync(aktivnaPoseta.id);
+                      void rezSokSobu.mutateAsync(aktivnaPoseta.id);
                     }}
                     className="flex transform items-center rounded-lg bg-red-600 px-4 py-2 font-medium capitalize tracking-wide text-white transition-colors duration-300 hover:bg-red-500 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-80"
                   >
@@ -205,7 +205,7 @@ function Layout({ id }: { id: string }) {
                 {aktivnaPoseta.sokSoba && (
                   <button
                     onClick={() => {
-                      osl.mutateAsync(aktivnaPoseta.id);
+                      void osl.mutateAsync(aktivnaPoseta.id);
                     }}
                     className="flex transform items-center rounded-lg bg-red-600 px-4 py-2 font-medium capitalize tracking-wide text-white transition-colors duration-300 hover:bg-red-500 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-80"
                   >
@@ -293,7 +293,7 @@ function NapisiIzvestajForma({ id }: { id: string }) {
     <button
       onClick={(e) => {
         e.stopPropagation();
-        router.push(`/izvestaj/novi/${id}`);
+        void router.push(`/izvestaj/novi/${id}`);
       }}
       className="flex transform items-center rounded-lg bg-blue-600 px-4 py-2 font-medium capitalize tracking-wide text-white transition-colors duration-300 hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-80"
     >
@@ -338,9 +338,9 @@ function IzvestajTable({ id }: { id: string }) {
         }}
         tableRowClick={(row) => {
           if (!row.izvestaj) {
-            router.push(`/izvestaj/novi/${row.id}`);
+            void router.push(`/izvestaj/novi/${row.id}`);
           } else {
-            router.push(`/izvestaj/${row.izvestaj.id}`);
+            void router.push(`/izvestaj/${row.izvestaj.id}`);
           }
         }}
       ></Table>
