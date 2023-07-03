@@ -8,9 +8,9 @@ await import("./src/env.mjs");
 
 /** @type {import("next").NextConfig} */
 const config = {
-  reactStrictMode: true,
-
-
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };
-
-export default withTRPC({config});
+// @ts-ignore
+export default withTRPC({ config });

@@ -21,13 +21,14 @@ export default function AddPacijent({
     reset,
   } = useForm<Prisma.PacijentCreateWithoutPoseteInput>();
   const onSubmit = handleSubmit((data) => {
-    mutateAsync({
+    void mutateAsync({
       datumRodj: new Date(data.datumRodj),
       ime: data.ime,
       jmbg: BigInt(data.jmbg),
       prezime: data.prezime,
       lbo: data.lbo,
     });
+
     closeModal();
   });
   function closeModal() {
@@ -69,7 +70,11 @@ export default function AddPacijent({
                   Dodaj pacijenta
                 </Dialog.Title>
                 <div className="mt-2">
-                  <form onSubmit={onSubmit}>
+                  <form
+                    onSubmit={() => {
+                      void onSubmit();
+                    }}
+                  >
                     <div className="flex flex-col gap-2">
                       <div>
                         <label className="text-gray-700 " htmlFor="ime">

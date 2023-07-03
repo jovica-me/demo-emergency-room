@@ -820,7 +820,18 @@ const names = [
   "Šiško",
   "Šana",
 ];
+function makelen13(jmbg: number) {
+  let jmbgString = jmbg > 100 ? jmbg.toString() : "99";
+  const jmbgLength = jmbgString.length;
 
+  if (jmbgLength > 13) {
+    return Number(jmbgString.slice(0, 12));
+  } else if (jmbgLength < 13) {
+    return Number(jmbgString.padEnd(12, "0"));
+  } else {
+    return jmbg;
+  }
+}
 async function main() {
   const id = "cl9ebqhxk00003b600tymydho";
 
@@ -832,7 +843,7 @@ async function main() {
       id: "sob" + Math.floor(Math.random() * 10000),
       brojSobe: "br" + Math.floor(Math.random() * 1000),
       imeOrdinacija: "Kardiologija",
-      kapacitet: 10,
+      kapacitet: Math.floor(Math.random() * 100),
       telefon: "+381-" + Math.floor(100 * (Math.random() * 10)),
     };
     ordinacije.push(temp1);
@@ -878,15 +889,15 @@ async function main() {
       datumRodj: new Date(Date.now() - Math.random() * 10000),
       ime: names[ranNum] + " ",
       prezime: names[Math.random() * names.length] + "vić",
-      jmbg: Math.floor(100000000000 * (Math.random() * 10)),
+      jmbg: makelen13(Math.floor(100000000000 * (Math.random() * 10))),
       lbo: "lbo" + 100000000000 * (Math.random() * 10),
     };
 
     pacijenti.push(pac);
   }
-  let posete: Prisma.PosetaUncheckedCreateInput[] = [];
+  let aktivnePosete: Prisma.PosetaUncheckedCreateInput[] = [];
   for (let index = 0; index < 100; index++) {
-    posete.push({
+    aktivnePosete.push({
       simptomi: "Glavobolja",
       prioritet: 0,
 
@@ -905,14 +916,42 @@ async function main() {
         // @ts-ignore
         ordinacije[Math.floor(Math.random() * ordinacije.length)].id,
       // @ts-ignore
-      posetaId: posete[Math.floor(Math.random() * posete.length)].id,
+      posetaId:
+        // @ts-ignore
+        aktivnePosete[Math.floor(Math.random() * aktivnePosete.length)].id,
     });
   }
-  prisma.$transaction([
-    prisma.ordinacija.createMany({
-      data: ordinacije,
-      skipDuplicates: true,
-    }),
+
+  let gotovePosete: Prisma.PosetaUncheckedCreateInput[] = [];
+
+  for (let index = 0; index < 100; index++) {
+    gotovePosete.push({
+      simptomi: "Glavobolja",
+      prioritet: 0,
+      dolazak: new Date(Date.now() - Math.random() * 10000),
+      odlazak: new Date(Date.now() - Math.random() * 10000),
+      gotova: true,
+      uput: "uput" + Math.floor(Math.random() * 10000),
+      pacijentJMBG:
+        // @ts-ignore
+        pacijenti[Math.floor(Math.random() * pacijenti.length)].jmbg,
+      id: "pos" + Math.floor(Math.random() * 10000),
+    });
+  }
+  for (let index = 0; index < 100; index++) {
+    pregledi.push({
+      // @ts-ignore
+      ordinacijaId:
+        // @ts-ignore
+        ordinacije[Math.floor(Math.random() * ordinacije.length)].id,
+      // @ts-ignore
+      posetaId:
+        // @ts-ignore
+        gotovePosete[Math.floor(Math.random() * gotovePosete.length)].id,
+    });
+  }
+
+  await prisma.$transaction([
     prisma.osoblje.createMany({
       //@ts-ignore
       data: osoblje,
@@ -923,11 +962,19 @@ async function main() {
       skipDuplicates: true,
     }),
     prisma.poseta.createMany({
-      data: posete,
+      data: aktivnePosete,
+      skipDuplicates: true,
+    }),
+    prisma.poseta.createMany({
+      data: gotovePosete,
       skipDuplicates: true,
     }),
     prisma.pregled.createMany({
       data: pregledi,
+      skipDuplicates: true,
+    }),
+    prisma.ordinacija.createMany({
+      data: ordinacije,
       skipDuplicates: true,
     }),
   ]);

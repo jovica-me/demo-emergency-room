@@ -11,7 +11,7 @@
     "db-seed": "NODE_ENV=development prisma db seed"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "npx tsx prisma/seed.ts"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.15",

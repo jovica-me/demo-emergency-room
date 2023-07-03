@@ -1,68 +1,75 @@
+import { JMBGContext, makelen13 } from "@/pages/pacijent";
 import { api } from "@/utils/api";
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { Prisma } from "@prisma/client";
-import { Fragment, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useRouter } from "next/router";
+import {
+  Dispatch,
+  Fragment,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { set, useForm } from "react-hook-form";
 
-export default function AddPoseta({
-  isOpen,
-  setIsOpen,
-  JMBG = 0n,
-}: {
-  isOpen: boolean;
-  setIsOpen: (val: boolean) => void;
-  JMBG?: bigint;
-}) {
+interface Pacijent {
+  jmbg: bigint;
+  ime: string;
+  prezime: string;
+  datumRodj: Date;
+  lbo: string;
+  danKreacije: Date;
+}
+
+export default function AddPoseta() {
+  const { jmbg, resetPosetaModel } = useContext(JMBGContext);
   const { mutateAsync } = api.poseta.add.useMutation();
   const {
     register,
-    setValue,
     handleSubmit,
     formState: { errors },
     reset,
-    getValues,
   } = useForm<Prisma.PosetaCreateManyInput>();
 
-  //   const [selected, setSelected] =
-  //     useState<Prisma.PacijentCreateWithoutPoseteInput>();
-
-  //   const [query, setQuery] = useState("");
-
-  //   const getMultipleWIthIDs = api.pacijent.getMultipleWIthID.useQuery(
-  //     BigInt(getValues().pacijentJMBG ? getValues().pacijentJMBG : 0)
-  //   );
-  const people = [
-    { id: 1, name: "Durward Reynolds", unavailable: false },
-    { id: 2, name: "Kenton Towne", unavailable: false },
-    { id: 3, name: "Therese Wunsch", unavailable: false },
-    { id: 4, name: "Benedict Kessler", unavailable: true },
-    { id: 5, name: "Katelyn Rohan", unavailable: false },
-  ];
-  const [selectedPerson, setSelectedPerson] = useState(people[0]);
-  const [query, setQuery] = useState("");
-  const filteredPeople =
-    query === ""
-      ? people
-      : people.filter((person) => {
-          return person.name.toLowerCase().includes(query.toLowerCase());
-        });
+  const getMultipleWIthIDs = api.pacijent.getMultipleWIthID.useQuery(jmbg, {
+    placeholderData: [
+      {
+        jmbg: jmbg,
+        ime: "",
+        prezime: "",
+        datumRodj: new Date(),
+        lbo: "",
+        danKreacije: new Date(),
+      },
+    ],
+  });
+  const people = getMultipleWIthIDs.data;
+  const router = useRouter();
 
   const onSubmit = handleSubmit((data) => {
+    console.log(data);
     mutateAsync({
-      pacijentJMBG: BigInt(data.pacijentJMBG),
+      pacijentJMBG: jmbg,
       simptomi: data.simptomi,
       prioritet: data.prioritet,
       uput: data.uput ? data.uput : "",
-    });
+    })
+      .then(() => {
+        void router.push("/pacijent/" + jmbg);
+      })
+      .catch(console.error);
+
     closeModal();
   });
+
   function closeModal() {
-    setIsOpen(false);
     reset();
+    resetPosetaModel();
   }
 
   return (
-    <Transition appear show={isOpen} as={Fragment}>
+    <Transition appear show={true} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={closeModal}>
         <Transition.Child
           as={Fragment}
@@ -95,100 +102,17 @@ export default function AddPoseta({
                   Dodaj pacijenta
                 </Dialog.Title>
                 <div className="mt-2">
-                  <form onSubmit={onSubmit}>
+                  <form
+                    onSubmit={() => {
+                      void onSubmit();
+                    }}
+                  >
                     <div className="flex flex-col gap-2">
                       <div>
                         <label className="text-gray-700 " htmlFor="JMBG">
                           Pacijent JMBG
                         </label>
-                        <Combobox
-                          value={selectedPerson}
-                          onChange={setSelectedPerson}
-                        >
-                          <div className="relative mt-1">
-                            <div className="relative w-full cursor-default overflow-hidden rounded-lg bg-white text-left shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
-                              <Combobox.Input
-                                className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
-                                displayValue={(person) => person.name}
-                                onChange={(event) =>
-                                  setQuery(event.target.value)
-                                }
-                              />
-                              <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-                                {/* <ChevronUpDownIcon
-                                  className="h-5 w-5 text-gray-400"
-                                  aria-hidden="true"
-                                /> */}
-                              </Combobox.Button>
-                            </div>
-                            <Transition
-                              as={Fragment}
-                              leave="transition ease-in duration-100"
-                              leaveFrom="opacity-100"
-                              leaveTo="opacity-0"
-                              afterLeave={() => setQuery("")}
-                            >
-                              <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                {filteredPeople.length === 0 && query !== "" ? (
-                                  <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
-                                    Nothing found.
-                                  </div>
-                                ) : (
-                                  filteredPeople.map((person) => (
-                                    <Combobox.Option
-                                      key={person.id}
-                                      className={({ active }) =>
-                                        `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                                          active
-                                            ? "bg-teal-600 text-white"
-                                            : "text-gray-900"
-                                        }`
-                                      }
-                                      value={person}
-                                    >
-                                      {({ selected, active }) => (
-                                        <>
-                                          <span
-                                            className={`block truncate ${
-                                              selected
-                                                ? "font-medium"
-                                                : "font-normal"
-                                            }`}
-                                          >
-                                            {person.name}
-                                          </span>
-                                          {selected ? (
-                                            <span
-                                              className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
-                                                active
-                                                  ? "text-white"
-                                                  : "text-teal-600"
-                                              }`}
-                                            >
-                                              {/* <CheckIcon
-                                                className="h-5 w-5"
-                                                aria-hidden="true"
-                                              /> */}
-                                            </span>
-                                          ) : null}
-                                        </>
-                                      )}
-                                    </Combobox.Option>
-                                  ))
-                                )}
-                              </Combobox.Options>
-                            </Transition>
-                          </div>
-                        </Combobox>
-                        {/* <input
-                          {...register("pacijentJMBG", {
-                            required: true,
-                            value: JMBG,
-                          })}
-                          id="JMBG"
-                          type="number"
-                          className="mt-2 block w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40 "
-                        /> */}
+                        {people && <Combo people={people} />}
                       </div>
                       <div>
                         <label className="text-gray-700 " htmlFor="simptomi">
@@ -222,6 +146,7 @@ export default function AddPoseta({
                           {...register("prioritet", {
                             required: true,
                             value: 0,
+                            valueAsNumber: true,
                           })}
                           id="prioritet"
                           type="number"
@@ -255,5 +180,88 @@ export default function AddPoseta({
         </div>
       </Dialog>
     </Transition>
+  );
+}
+
+function Combo({ people }: { people: Pacijent[] }) {
+  const { jmbg, setJmbg } = useContext(JMBGContext);
+  const [selectedPerson, setSelectedPerson] = useState(
+    people?.findLast((val) => val.jmbg === jmbg) ?? null
+  );
+
+  useEffect(() => {
+    setJmbg(selectedPerson?.jmbg ?? BigInt(0));
+  }, [selectedPerson]);
+
+  return (
+    <Combobox value={selectedPerson} onChange={setSelectedPerson}>
+      <div className="relative mt-1">
+        <div className="relative mt-2 block w-full  ">
+          <Combobox.Input
+            className="w-full   rounded-md border border-gray-200 bg-white px-4 py-2 text-sm leading-5 text-gray-700  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40"
+            displayValue={(person: { jmbg: bigint }) => person?.jmbg.toString()}
+            onChange={(event) => {
+              setJmbg(BigInt(event.target.value));
+            }}
+          />
+          <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+            {/* <ChevronUpDownIcon
+                                  className="h-5 w-5 text-gray-400"
+                                  aria-hidden="true"
+                                /> */}
+          </Combobox.Button>
+        </div>
+        <Transition
+          as={Fragment}
+          leave="transition ease-in duration-100"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+            {people && people.length === 0 ? (
+              <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
+                Nothing found.
+              </div>
+            ) : (
+              people?.map((person) => (
+                <Combobox.Option
+                  key={person.jmbg.toString()}
+                  className={({ active }) =>
+                    `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                      active ? "bg-teal-600 text-white" : "text-gray-900"
+                    }`
+                  }
+                  value={person}
+                >
+                  {({ selected, active }) => (
+                    <>
+                      <span
+                        className={`block truncate ${
+                          selected ? "font-medium" : "font-normal"
+                        }`}
+                      >
+                        {person.ime} - {person.jmbg.toString()}
+                      </span>
+                      {selected ? (
+                        <span
+                          className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
+                            active ? "text-white" : "text-teal-600"
+                          }`}
+                        >
+                          {/* <CheckIcon
+                                                className="h-5 w-5"
+                                                aria-hidden="true"
+                                              /> */}
+                        </span>
+                      ) : null}
+                    </>
+                  )}
+                </Combobox.Option>
+              ))
+            )}
+          </Combobox.Options>
+        </Transition>
+      </div>
+    </Combobox>
   );
 }

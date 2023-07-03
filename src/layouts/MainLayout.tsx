@@ -12,16 +12,41 @@ type NavItem = {
 };
 const nav: NavGroup[] = [
   {
-    name: "Pacijenti",
+    name: "Recepcioner",
     items: [
       {
-        name: "Pacijenti (pokazi sve)",
-        href: "/",
-        d: "M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.061 12.061 0 0116.5 7.605",
+        name: "Pacijenti",
+        href: "/pacijent",
+        d: "",
       },
       {
-        name: "Šok sobe",
-        href: "/pacijenti",
+        name: "Šok Sobe",
+        href: "/sok-soba",
+        d: "",
+      },
+    ],
+  },
+  {
+    name: "Medicinski Radnik",
+    items: [
+      {
+        name: "Posete",
+        href: "/poseta",
+        d: "",
+      },
+    ],
+  },
+  {
+    name: "Administrator",
+    items: [
+      {
+        name: "Ordinacija",
+        href: "/ordinacija",
+        d: "",
+      },
+      {
+        name: "Osoblje",
+        href: "/osoblje",
         d: "",
       },
     ],
@@ -66,7 +91,7 @@ function SideBar() {
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke-width="1.5"
+              strokeWidth="1.5"
               stroke="currentColor"
               className="h-6 w-6"
             >
@@ -86,7 +111,7 @@ function SideBar() {
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke-width="1.5"
+              strokeWidth="1.5"
               stroke="currentColor"
               className="h-6 w-6"
             >
@@ -106,7 +131,7 @@ function SideBar() {
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke-width="1.5"
+              strokeWidth="1.5"
               stroke="currentColor"
               className="h-6 w-6"
             >
@@ -131,7 +156,7 @@ function SideBar() {
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke-width="1.5"
+              strokeWidth="1.5"
               stroke="currentColor"
               className="h-6 w-6"
             >
@@ -151,7 +176,7 @@ function SideBar() {
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke-width="1.5"
+              strokeWidth="1.5"
               stroke="currentColor"
               className="h-6 w-6"
             >
@@ -186,7 +211,7 @@ function SideBar() {
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke-width="1.5"
+              strokeWidth="1.5"
               stroke="currentColor"
               className="h-6 w-6"
             >
@@ -202,7 +227,7 @@ function SideBar() {
       <div className="w-full overflow-y-auto px-5 py-8  sm:w-64">
         <nav className="-mx-3 space-y-6 ">
           {nav.map((group) => (
-            <NavGroup group={group} />
+            <NavGroup key={group.name} group={group} />
           ))}
         </nav>
       </div>
@@ -233,7 +258,7 @@ function NavItem({ item }: { item: NavItem }) {
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
-        stroke-width="1.5"
+        strokeWidth="1.5"
         stroke="currentColor"
         className="h-5 w-5"
       >
