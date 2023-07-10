@@ -23,8 +23,9 @@ interface Pacijent {
 }
 
 export default function AddPoseta() {
-  const { jmbg, resetPosetaModel } = useContext(JMBGContext);
+  const { jmbg, resetPosetaModel, hitno } = useContext(JMBGContext);
   const { mutateAsync } = api.poseta.add.useMutation();
+  const { mutateAsync: hitnoAsync } = api.poseta.addHitno.useMutation();
   const {
     register,
     handleSubmit,
@@ -49,16 +50,29 @@ export default function AddPoseta() {
 
   const onSubmit = handleSubmit((data) => {
     console.log(data);
-    mutateAsync({
-      pacijentJMBG: jmbg,
-      simptomi: data.simptomi,
-      prioritet: data.prioritet,
-      uput: data.uput ? data.uput : "",
-    })
-      .then(() => {
-        void router.push("/pacijent/" + jmbg);
+    if (hitno) {
+      hitnoAsync({
+        pacijentJMBG: jmbg,
+        simptomi: data.simptomi,
+        prioritet: data.prioritet,
+        uput: data.uput ? data.uput : "",
       })
-      .catch(console.error);
+        .then(() => {
+          void router.push("/pacijent/" + jmbg);
+        })
+        .catch(console.error);
+    } else {
+      mutateAsync({
+        pacijentJMBG: jmbg,
+        simptomi: data.simptomi,
+        prioritet: data.prioritet,
+        uput: data.uput ? data.uput : "",
+      })
+        .then(() => {
+          void router.push("/pacijent/" + jmbg);
+        })
+        .catch(console.error);
+    }
 
     closeModal();
   });
@@ -99,7 +113,7 @@ export default function AddPoseta() {
                   as="h3"
                   className="text-lg font-medium leading-6 text-gray-900"
                 >
-                  Dodaj pacijenta
+                  Napvi posetu
                 </Dialog.Title>
                 <div className="mt-2">
                   <form

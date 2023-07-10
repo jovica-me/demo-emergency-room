@@ -81,7 +81,7 @@ export default function MainLayout({
 function SideBar() {
   return (
     <aside className="flex h-full  ">
-      <div className="flex w-16 flex-col items-center py-8 ">
+      {/* <div className="flex w-16 flex-col items-center py-8 ">
         <nav className="flex flex-1 flex-col items-center space-y-8 ">
           <a
             href="#"
@@ -223,15 +223,21 @@ function SideBar() {
             </svg>
           </a>
         </div>
-      </div>
-      <div className="w-full overflow-y-auto px-5 py-8  sm:w-64">
-        <nav className="-mx-3 space-y-6 ">
-          {nav.map((group) => (
-            <NavGroup key={group.name} group={group} />
-          ))}
-        </nav>
-      </div>
+      </div> */}
+      <InnerNav></InnerNav>
     </aside>
+  );
+}
+
+export function InnerNav() {
+  return (
+    <div className="w-full overflow-y-auto px-5 py-8  sm:w-64">
+      <nav className="-mx-3 space-y-6 ">
+        {nav.map((group) => (
+          <NavGroup key={group.name} group={group} />
+        ))}
+      </nav>
+    </div>
   );
 }
 

@@ -22,6 +22,40 @@ export const posetaRouter = createTRPCRouter({
         },
       });
     }),
+
+  addHitno: publicProcedure
+    .input(
+      z.object({
+        uput: z.string(),
+        simptomi: z.string(),
+        prioritet: z.number(),
+        pacijentJMBG: z.bigint(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const solobodnaSokSOba = await ctx.prisma.sokSoba.findFirst({
+        where: {
+          zauzeta: false,
+        },
+      });
+      if (solobodnaSokSOba == null) return null;
+
+      return ctx.prisma.poseta.create({
+        data: {
+          dolazak: new Date(),
+          uput: input.uput,
+          simptomi: input.simptomi,
+          prioritet: input.prioritet,
+          pacijentJMBG: input.pacijentJMBG,
+          sokSoba: {
+            connect: {
+              id: solobodnaSokSOba.id,
+            },
+          },
+        },
+      });
+    }),
+
   getPoseteWithName: publicProcedure
     .input(z.string())
     .query(({ ctx, input }) => {

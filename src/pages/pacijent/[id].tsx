@@ -50,10 +50,7 @@ export default function Page({}) {
 }
 
 function Layout({ id }: { id: string }) {
-  const pacijentQuery = api.pacijent.getOneWithIdAndPosete.useQuery(
-    BigInt(id),
-    { cacheTime: 0 }
-  );
+  const pacijentQuery = api.pacijent.getOneWithIdAndPosete.useQuery(BigInt(id));
   const end = api.poseta.end.useMutation();
   const endWithSok = api.poseta.endWithSok.useMutation();
   const rezSokSobu = api.sokSoba.brzoRezervisi.useMutation();
@@ -63,6 +60,10 @@ function Layout({ id }: { id: string }) {
 
   const [isOdjavaModalOpen, setIsOdjavaModalOpen] = useState(false);
   const [isAddPregledModalOpen, setIsAddPregledModalOpen] = useState(false);
+
+  const refetch = () => {
+    void pacijentQuery.refetch();
+  };
 
   useEffect(() => {
     if (pacijentQuery.data) {
@@ -109,7 +110,7 @@ function Layout({ id }: { id: string }) {
               <h2 className="text-lg font-medium text-gray-800  ">
                 Aktivna poseta: {aktivnaPoseta.id}
               </h2>
-              {aktivnaPoseta.prioritet > 10 && (
+              {aktivnaPoseta.prioritet > 0 && (
                 <div className="flex flex-col rounded-xl bg-orange-100 p-4">
                   <h2 className="text-lg font-medium text-orange-900  ">
                     Prioritet: {aktivnaPoseta.prioritet}
@@ -189,6 +190,7 @@ function Layout({ id }: { id: string }) {
                   <AddPregledi
                     close={() => {
                       setIsAddPregledModalOpen(false);
+                      refetch();
                     }}
                   ></AddPregledi>
                 )}
@@ -196,6 +198,7 @@ function Layout({ id }: { id: string }) {
                   <button
                     onClick={() => {
                       void rezSokSobu.mutateAsync(aktivnaPoseta.id);
+                      refetch();
                     }}
                     className="flex transform items-center rounded-lg bg-red-600 px-4 py-2 font-medium capitalize tracking-wide text-white transition-colors duration-300 hover:bg-red-500 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-80"
                   >
@@ -206,6 +209,7 @@ function Layout({ id }: { id: string }) {
                   <button
                     onClick={() => {
                       void osl.mutateAsync(aktivnaPoseta.id);
+                      refetch();
                     }}
                     className="flex transform items-center rounded-lg bg-red-600 px-4 py-2 font-medium capitalize tracking-wide text-white transition-colors duration-300 hover:bg-red-500 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-80"
                   >
@@ -319,7 +323,9 @@ const colIzvestajAll = [
 ];
 
 function IzvestajTable({ id }: { id: string }) {
-  const query = api.pregled.getOneWithIzvestajAndDatoteka.useQuery(id);
+  const query = api.pregled.getOneWithIzvestajAndDatoteka.useQuery(id, {
+    refetchInterval: 1000,
+  });
   const { data } = query;
   const router = useRouter();
 

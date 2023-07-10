@@ -13,6 +13,14 @@ BigInt.prototype.toJSON = function (): string {
 };
 
 export const sokSobaRouter = createTRPCRouter({
+  getOne: publicProcedure.input(z.string()).query(({ ctx, input }) => {
+    return ctx.prisma.sokSoba.findUnique({
+      where: {
+        id: input,
+      },
+    });
+  }),
+
   getCurrentAll: publicProcedure
     .input(z.number().int())
     .query(({ input, ctx }) => {
