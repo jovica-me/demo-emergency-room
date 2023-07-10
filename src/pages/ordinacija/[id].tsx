@@ -13,7 +13,7 @@ export default function Page() {
   return (
     <MainLayout>
       <main className="container flex flex-col  p-4">
-        <div className="grid  grid-cols-[3fr_2fr] items-center justify-center">
+        <div className=" flex flex-row items-center  justify-center sm:grid sm:grid-cols-[3fr_2fr]">
           <div>
             <h2 className="text-lg font-medium text-gray-800  ">Ordinacije</h2>
             <p className="mt-1 text-sm text-gray-500  "></p>

@@ -88,7 +88,7 @@ function Layout({ id }: { id: string }) {
     <PacijentContext.Provider
       value={{ idPregleda, setIdPregleda, idPosete, setIdPosete }}
     >
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid gap-4 sm:grid-cols-2">
         <Head>
           <title>
             Poseta - {ime} {prezime}{" "}

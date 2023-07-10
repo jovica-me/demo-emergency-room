@@ -69,8 +69,8 @@ export default function MainLayout({
   type?: PesonalType;
 }) {
   return (
-    <div className="static grid grid-cols-[minmax(200px,320px)_minmax(400px,1fr)] bg-gray-200">
-      <div className="sticky top-0 max-h-screen  ">
+    <div className="static flex flex-col bg-gray-200 sm:grid sm:grid-cols-[minmax(200px,260px)_minmax(400px,1fr)]">
+      <div className="sm:sticky sm:top-0 sm:max-h-screen  ">
         <SideBar />
       </div>
       <div className=" flex min-h-screen flex-col">{children}</div>
