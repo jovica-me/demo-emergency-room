@@ -88,7 +88,7 @@ function Layout({ id }: { id: string }) {
     <PacijentContext.Provider
       value={{ idPregleda, setIdPregleda, idPosete, setIdPosete }}
     >
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Head>
           <title>
             Poseta - {ime} {prezime}{" "}
@@ -223,7 +223,7 @@ function Layout({ id }: { id: string }) {
         {idPosete && <IzvestajTable id={idPosete} />}
 
         {listaBezAktive.length !== 0 && (
-          <div className="col-start-2 flex flex-col rounded-xl bg-white p-4">
+          <div className="flex flex-col rounded-xl bg-white p-4 sm:col-start-2">
             <h2 className="text-lg font-medium text-gray-800  ">
               Prethodne posete
             </h2>

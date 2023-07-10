@@ -89,7 +89,7 @@ export default function Page() {
         </Head>
         <Tab.Group>
           <main className="container flex flex-col  p-4">
-            <div className="grid  grid-cols-[1fr_1fr_1fr] items-center justify-center gap-4">
+            <div className="grid  gap-4 sm:grid-cols-[1fr_1fr_1fr] sm:items-center sm:justify-center">
               <div>
                 <h2 className="text-lg font-medium text-gray-800  ">
                   Sve posete

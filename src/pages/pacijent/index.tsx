@@ -84,13 +84,13 @@ export default function Page({}) {
         }}
       >
         <main className="container flex flex-col  p-4">
-          <div className="grid  grid-cols-[3fr_2fr] items-center justify-center">
+          <div className="grid grid-cols-1 items-center  sm:grid-cols-[3fr_2fr]">
             <div>
               <h2 className="text-lg font-medium text-gray-800  ">Pacijenti</h2>
 
               <p className="mt-1 text-sm text-gray-500  "></p>
             </div>
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-4 sm:flex-row">
               <button
                 onClick={() => {
                   setIsPacijentAddModalOpen(true);
